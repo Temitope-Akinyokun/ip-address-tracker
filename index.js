@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
@@ -13,8 +13,8 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', (req, res) => {
-    let ipAddress = req.body.IPaddress;
-    console.log(ipAddress);
+    let ipAddress = req.body.ipAddress;
+    console.log(req.body);
 
     let url = 'https://geo.ipify.org/api/v2/country,city?apiKey=at_uRWlk9ncEBAp2iIopBoONU75d8fX9&ipAddress=' + ipAddress;
     let options = {
@@ -23,15 +23,16 @@ app.post('/', (req, res) => {
 
     let request = https.request(url, options, (resp) => {
         console.log(resp.statusCode);
-        let parsedData;
+        let parsedData = '';
 
         resp.on('data', (d) => {
-            parsedData = JSON.parse(d);
-            console.log(parsedData);
-            console.log(parsedData.location.lat);
+            parsedData += d;
+
         })
 
-      // resp.send(parsedData.location.lat);
+        resp.on('end', () => {
+            res.send(JSON.parse(parsedData));
+        })
 
     })
 

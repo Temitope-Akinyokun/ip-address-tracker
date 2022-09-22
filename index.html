@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IP Adress Tracker</title>
 
-    
+
     <!-- LEAFLET.JS STYLESHEET -->
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
         integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
         crossorigin="" />
 
@@ -45,7 +45,7 @@
         <div class="container d-flex justify-content-center mt-4">
             <div class="row height d-flex justify-content-center align-items-center search-field">
 
-                <form action="/" method="post">
+                <form action="/" method="post" class="submit-form">
                     <div class="col-lg-12">
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" placeholder="Search for any IP address or domain"
@@ -68,22 +68,26 @@
 
                 <div class="col-lg-3 col-md-3">
                     <p class="inline">IP ADDRESS</p>
-                    <h4 class="ip-address inline"></h1>
+                    <h4 class="ip-address inline">
+                        </h1>
                 </div>
 
                 <div class="col-lg-3 col-md-3">
                     <p class="inline">LOCATION</p>
-                    <h4 class="location inline"></h1>
+                    <h4 class="location inline">
+                        </h1>
                 </div>
 
                 <div class="col-lg-3 col-md-3">
                     <p class="inline">TIMEZONE</p>
-                    <h4 class="timezone inline"></h1>
+                    <h4 class="timezone inline">
+                        </h1>
                 </div>
 
                 <div class="col-lg-3 col-md-3">
                     <p class="inline">ISP</p>
-                    <h4 class="isp inline"></h1>
+                    <h4 class="isp inline">
+                        </h1>
                 </div>
 
             </div>
@@ -94,11 +98,45 @@
 
     <script>
 
-        let ipURL = 'https://geo.ipify.org/api/v2/country,city?apiKey=at_uRWlk9ncEBAp2iIopBoONU75d8fX9&ipAddress=';
+        let ipURL = 'http://localhost:3000';
         let ipAddress = document.querySelector('.ip-address');
         let country = document.querySelector('.location');
         let timezone = document.querySelector('.timezone');
         let isp = document.querySelector('.isp');
+        let form = document.querySelector('.submit-form');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            document.querySelector('button').addEventListener('click', getLocation);
+
+        })
+
+        async function getLocation() {
+            let val = document.querySelector('input').value;
+
+            console.log({ ipAddress: val });
+
+            const response = await fetch('/', {
+                method: 'POST',
+                body: JSON.stringify({ ipAddress: val })
+            });
+
+            let data = await response.json();
+            console.log(data);
+
+            let latitude = data.location.lat;
+            let longitude = data.location.lng;
+
+            marker.setLatLng([latitude, longitude]);
+            map.setView([latitude, longitude], 13);
+
+            ipAddress.textContent = data.ip;
+            country.textContent = data.location.country + ', ' + data.location.region;
+            timezone.textContent = data.location.timezone;
+            isp.textContent = data.isp;
+
+        }
 
         // INITIALIZING MAP
 
@@ -124,27 +162,6 @@
 
         // UPDATE MAP VIEW WITH 'IPIFY' API
 
-        document.querySelector('button').addEventListener('click', getLocation);
-
-        async function getLocation() {
-            let val = document.querySelector('input').value;
-            let response = await fetch(ipURL + val)
-            let data = await response.json();
-
-            let latitude = data.location.lat;
-            let longitude = data.location.lng;
-
-            marker.setLatLng([latitude, longitude]);
-            map.setView([latitude, longitude], 13);
-
-            ipAddress.textContent = data.ip;
-            country.textContent = data.location.country + ', ' + data.location.region;
-            timezone.textContent = data.location.timezone;
-            isp.textContent = data.isp;
-
-        }
-
-               //let ipKey = 'at_uRWlk9ncEBAp2iIopBoONU75d8fX9';
 
     </script>
 
