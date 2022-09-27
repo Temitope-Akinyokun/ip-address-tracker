@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
     let ipAddress = req.body.ipAddress;
-    console.log(req.body);
+    console.log(req.body.ipAddress);
 
     let url = 'https://geo.ipify.org/api/v2/country,city?apiKey=at_uRWlk9ncEBAp2iIopBoONU75d8fX9&ipAddress=' + ipAddress;
     let options = {
